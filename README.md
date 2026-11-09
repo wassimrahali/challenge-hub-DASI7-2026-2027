@@ -1,10 +1,12 @@
 <div align="center">
 
+<img src="documentation/assets/readme-banner.svg" alt="Blue and violet banner showing connected service nodes" width="100%" />
+
 <h1>Spring Cloud Eureka Microservices</h1>
 
-<p><strong>An academic workspace for designing and building a distributed application.</strong></p>
+<p><strong>One workspace for the architecture, code, and documentation of a distributed application.</strong></p>
 
-<p>Architecture in progress · Spring Cloud Eureka planned · No runnable services yet</p>
+<p>🟣 Architecture phase &nbsp;·&nbsp; 🔵 Eureka planned &nbsp;·&nbsp; ⚪ Implementation pending</p>
 
 <p>
   <a href="#overview">Overview</a> ·
@@ -36,20 +38,20 @@ The frontend contains folders for assets, components, pages, routes, services, a
 
 ## Roadmap
 
-### 01 · Design the system
+### 🟣 01 · Design the system
 
 - [ ] Define use cases and service responsibilities
 - [ ] Decide how services communicate and own their data
 - [ ] Complete the architecture and communication diagrams
 - [ ] Specify API contracts and the technology stack
 
-### 02 · Build the application
+### 🔵 02 · Build the application
 
 - [ ] Implement Eureka and the first backend services
 - [ ] Build the frontend and connect it to the APIs
 - [ ] Add persistence, security, and error handling
 
-### 03 · Make it reproducible
+### 🟢 03 · Make it reproducible
 
 - [ ] Document local startup and configuration
 - [ ] Add tests, health checks, and logging
