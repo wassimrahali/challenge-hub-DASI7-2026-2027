@@ -1,6 +1,5 @@
 <div align="center">
 
-<img src="documentation/assets/readme-banner.svg" alt="Blue and violet banner showing connected service nodes" width="100%" />
 
 <h1>Spring Cloud Eureka Microservices</h1>
 
