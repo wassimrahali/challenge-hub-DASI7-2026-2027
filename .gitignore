@@ -1,0 +1,79 @@
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs and temporary files
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+
+# Node / Frontend
+node_modules/
+.npm/
+.pnpm-store/
+.cache/
+.next/
+out/
+build/
+dist/
+coverage/
+.env
+.env.*
+
+# Java / JVM
+*.class
+*.jar
+*.war
+*.ear
+target/
+build/
+.gradle/
+!gradle-wrapper.jar
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+venv/
+.venv/
+
+# Database and local config
+*.sqlite
+*.db
+*.sql
+
+# Docker
+.docker/
+
+# Archives
+*.zip
+*.tar
+*.gz
+*.rar
+
+# Package managers
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Test reports
+test-output/
+reports/
+
+# Generated documents and binaries (keep intentionally for project docs)
+# Add project-specific ignore patterns here as needed.
+
+# Local secrets
+secrets/
+*.pem
+*.key
