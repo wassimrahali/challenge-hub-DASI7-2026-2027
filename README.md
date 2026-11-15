@@ -1,75 +1,106 @@
 <div align="center">
 
+<h1>ChallengeHub</h1>
 
-<h1>Spring Cloud Eureka Microservices</h1>
+<p><strong>Plateforme de hackathons avec évaluation automatique du code et recrutement des meilleurs développeurs.</strong></p>
 
-<p><strong>One workspace for the architecture, code, and documentation of a distributed application.</strong></p>
+<p>Module AWD · Applications Web Distribuées · ESPRIT 2026-2027</p>
 
-<p>🟣 Architecture phase &nbsp;·&nbsp; 🔵 Eureka planned &nbsp;·&nbsp; ⚪ Implementation pending</p>
+<p>🟣 Conception validée &nbsp;·&nbsp; 🔵 Implémentation à venir &nbsp;·&nbsp; ⚪ Déploiement à définir</p>
 
 <p>
-  <a href="#overview">Overview</a> ·
-  <a href="#workspace">Workspace</a> ·
-  <a href="#roadmap">Roadmap</a> ·
-  <a href="#documentation">Documentation</a>
+  <a href="#présentation">Présentation</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="#microservices">Microservices</a> ·
+  <a href="#documentation">Documentation</a> ·
+  <a href="#feuille-de-route">Feuille de route</a>
 </p>
 
 </div>
 
 ---
 
-## Overview
+## Présentation
 
-This repository is the team's shared workspace for a microservices project. It brings the backend, frontend, infrastructure, and documentation together so the system can be designed and built in clear stages.
+Une entreprise publie ses vrais problèmes techniques sous forme de défis de hackathon ; les participants proposent des solutions en Python ou Java, que la plateforme exécute et note automatiquement ; l'entreprise récupère les meilleures solutions et recrute les développeurs les mieux classés.
 
-> **Current stage:** The repository structure is in place. Service boundaries, technology choices, API contracts, and the application itself still need to be defined and implemented.
+| 7 | 3 | 3 | 2 |
+| :---: | :---: | :---: | :---: |
+| microservices | frameworks back-end | types de bases | langages évalués |
+
+> **État actuel :** la phase de conception et de modélisation (Validation 1) est terminée et documentée. Le code des services n'est pas encore implémenté.
+
+## Architecture
+
+![Architecture globale](documentation/architecture/global-architecture.png)
+
+Le frontend Angular ne parle qu'à l'**API Gateway**, qui vérifie le jeton **Keycloak** (JWT), trouve le service grâce à **Eureka** et route `/api/**`. Les services lisent leur configuration dans le **Config Server** et s'appellent en REST. Chaque service possède sa propre base.
+
+## Microservices
+
+| # | Service | Responsabilité | Technologie | Base |
+| :--- | :--- | :--- | :--- | :--- |
+| MS1 | Utilisateurs (commun) | Comptes, profils, rôles, lien Keycloak | Spring Boot 3 | PostgreSQL |
+| MS2 | Hackathon | Hackathons, équipes, invitations, inscriptions | Spring Boot 3 | PostgreSQL |
+| MS3 | Problèmes | Énoncés, tests publics et cachés, limites, points | Spring Boot 3 | PostgreSQL |
+| MS4 | Soumissions | Enregistrement, éligibilité, meilleures solutions | Spring Boot 3 | MongoDB |
+| MS5 | Exécution | Exécution isolée du code, verdict par test | Python + FastAPI | MySQL |
+| MS6 | Classement | Scores, rang, validation finale | NestJS | PostgreSQL |
+| MS7 | Talent | Portfolio, filtre des candidats, email de recrutement | Spring Boot 3 + Mail | MongoDB |
 
 ## Workspace
 
-| Area | What belongs here | Status |
+| Dossier | Contenu | État |
 | :--- | :--- | :--- |
-| **[Backend](backend/)** | Microservices and service discovery | Placeholder |
-| **[Frontend](frontend/)** | User interface and API integration | Folder structure |
-| **[Infrastructure](infrastructure/)** | Local setup and deployment configuration | Placeholder |
-| **[Documentation](documentation/)** | Architecture, API, configuration, and presentations | Initial outlines |
-
-The frontend contains folders for assets, components, pages, routes, services, and styles. There is no application code or runnable service yet.
-
-## Roadmap
-
-### 🟣 01 · Design the system
-
-- [ ] Define use cases and service responsibilities
-- [ ] Decide how services communicate and own their data
-- [ ] Complete the architecture and communication diagrams
-- [ ] Specify API contracts and the technology stack
-
-### 🔵 02 · Build the application
-
-- [ ] Implement Eureka and the first backend services
-- [ ] Build the frontend and connect it to the APIs
-- [ ] Add persistence, security, and error handling
-
-### 🟢 03 · Make it reproducible
-
-- [ ] Document local startup and configuration
-- [ ] Add tests, health checks, and logging
-- [ ] Prepare deployment configuration
+| **[backend/](backend/)** | Microservices, Eureka, Config Server, Gateway | À implémenter |
+| **[frontend/](frontend/)** | Application Angular | Structure de dossiers |
+| **[infrastructure/](infrastructure/)** | Lancement local et déploiement | À définir |
+| **[documentation/](documentation/)** | Conception, API, configuration, présentations | Complète pour la Validation 1 |
 
 ## Documentation
 
-| Resource | Purpose |
+| Ressource | Contenu |
 | :--- | :--- |
-| [API documentation](documentation/technical/api-documentation.md) | Service endpoints and interface contracts |
-| [Configuration notes](documentation/technical/configuration.md) | Environment and deployment settings |
-| [Architecture files](documentation/architecture/) | System and communication diagrams |
+| [Index de la documentation](documentation/README.md) | Point d'entrée |
+| [Cahier des charges (PDF)](documentation/specifications/cahier-des-charges.pdf) | Spécification complète |
+| [Vue d'ensemble et cas d'utilisation](documentation/architecture/README.md) | Acteurs, user stories, périmètre |
+| [Architecture technique](documentation/technical/architecture.md) | Microservices, technologies, risques |
+| [Modèle de données](documentation/technical/data-model.md) | Diagrammes de classes par service |
+| [Communication entre services](documentation/technical/communication.md) | Appels REST, parcours d'une soumission, pannes |
+| [Documentation d'API](documentation/technical/api-documentation.md) | Endpoints et codes de statut |
+| [Configuration](documentation/technical/configuration.md) | Ports, Eureka, Keycloak, sécurité |
+| [Présentation de groupe](documentation/presentations/group-presentation.pptx) | Diaporama Validation 1 |
 
-The API and configuration documents are outlines. The diagram files are empty placeholders until the architecture is defined.
+## Feuille de route
 
-## Getting started
+### 🟣 01 · Concevoir le système
 
-The project does not have build or run commands yet. Begin with the [roadmap](#roadmap); setup instructions will follow when the first services are implemented.
+- [x] Définir acteurs, cas d'utilisation et besoins fonctionnels
+- [x] Découper en 7 microservices avec technologies et bases
+- [x] Diagrammes de classes et architecture globale
+- [x] Contrats d'API et règles de communication
 
-## Contributing
+### 🔵 02 · Construire l'application
 
-Keep documentation alongside implementation. When introducing a service, describe its responsibility, API contract, and configuration so other team members can work with it.
+- [ ] Eureka Server, Config Server, API Gateway, Keycloak
+- [ ] MS1 Utilisateurs (service commun)
+- [ ] MS2 à MS7, un service par étudiant
+- [ ] Frontend Angular connecté à la Gateway
+
+### 🟢 03 · Fiabiliser
+
+- [ ] Tests de bout en bout dès que deux services communiquent
+- [ ] Circuit breakers, health checks, logs
+- [ ] Documentation de lancement et déploiement
+
+## Démarrage
+
+Il n'y a pas encore de commande de build ou de lancement. Les instructions seront ajoutées avec les premiers services ; l'ordre de démarrage prévu est décrit dans la [configuration](documentation/technical/configuration.md#lancement-local).
+
+## Équipe
+
+Houssein Barbirou · Youssef Ben Othmen · Mahdi Abidi · Mayssoun Miaadi · Wassim Rahli · Chedi Mastouri
+
+## Contribuer
+
+Gardez la documentation à côté du code. Pour tout nouveau service, décrivez sa responsabilité, son contrat d'API et sa configuration.
