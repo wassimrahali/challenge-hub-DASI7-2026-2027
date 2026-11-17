@@ -1,4 +1,15 @@
+name: challengehub
+
+x-spring-common: &spring-common
+  restart: unless-stopped
+  environment: &spring-env
+    SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+    EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/challengehub/protocol/openid-connect/certs
+  networks: [challengehub]
+
 services:
+  # ---------- Security ----------
   keycloak-db:
     image: postgres:16
     container_name: keycloak-db
@@ -14,6 +25,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks: [challengehub]
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.0
@@ -36,6 +48,197 @@ services:
         condition: service_healthy
     volumes:
       - ./keycloak/realm-export:/opt/keycloak/data/import
+    networks: [challengehub]
+
+  # ---------- Infrastructure ----------
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    restart: unless-stopped
+    ports:
+      - "8761:8761"
+    networks: [challengehub]
+
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    restart: unless-stopped
+    environment:
+      SPRING_PROFILES_ACTIVE: native
+      SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS: file:/config-repo
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    volumes:
+      - ./config-repo:/config-repo:ro
+    ports:
+      - "8888:8888"
+    depends_on:
+      - eureka-server
+    networks: [challengehub]
+
+  api-gateway:
+    <<: *spring-common
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+      - config-server
+      - keycloak
+    networks: [challengehub]
+
+  # ---------- Databases (profile: services) ----------
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    profiles: ["services"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks: [challengehub]
+
+  mongo:
+    image: mongo:7
+    container_name: mongo
+    profiles: ["services"]
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    networks: [challengehub]
+
+  mysql:
+    image: mysql:8.4
+    container_name: mysql
+    profiles: ["services"]
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: execution_db
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [challengehub]
+
+  # ---------- Business services (profile: services) ----------
+  user-service:
+    <<: *spring-common
+    build: ../backend/ms1-utilisateurs
+    container_name: user-service
+    profiles: ["services"]
+    environment:
+      <<: *spring-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/user_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    ports: ["8081:8081"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      config-server: { condition: service_started }
+
+  hackathon-service:
+    <<: *spring-common
+    build: ../backend/ms2-hackathon
+    container_name: hackathon-service
+    profiles: ["services"]
+    environment:
+      <<: *spring-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/hackathon_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    ports: ["8082:8082"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      config-server: { condition: service_started }
+
+  probleme-service:
+    <<: *spring-common
+    build: ../backend/ms3-problemes
+    container_name: probleme-service
+    profiles: ["services"]
+    environment:
+      <<: *spring-env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/probleme_db
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    ports: ["8083:8083"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      config-server: { condition: service_started }
+
+  soumission-service:
+    <<: *spring-common
+    build: ../backend/ms4-soumissions
+    container_name: soumission-service
+    profiles: ["services"]
+    environment:
+      <<: *spring-env
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/soumission_db
+    ports: ["8084:8084"]
+    depends_on:
+      mongo: { condition: service_started }
+      config-server: { condition: service_started }
+
+  execution-service:
+    build: ../backend/ms5-execution
+    container_name: execution-service
+    profiles: ["services"]
+    restart: unless-stopped
+    environment:
+      EUREKA_SERVER: http://eureka-server:8761/eureka/
+      CONFIG_SERVER: http://config-server:8888
+      DATABASE_URL: mysql+pymysql://root:${MYSQL_ROOT_PASSWORD}@mysql:3306/execution_db
+    ports: ["8085:8085"]
+    depends_on:
+      mysql: { condition: service_healthy }
+      config-server: { condition: service_started }
+    networks: [challengehub]
+
+  classement-service:
+    build: ../backend/ms6-classement
+    container_name: classement-service
+    profiles: ["services"]
+    restart: unless-stopped
+    environment:
+      EUREKA_SERVER: http://eureka-server:8761/eureka/
+      CONFIG_SERVER: http://config-server:8888
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/classement_db
+    ports: ["8086:8086"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      config-server: { condition: service_started }
+    networks: [challengehub]
+
+  talent-service:
+    <<: *spring-common
+    build: ../backend/ms7-talent
+    container_name: talent-service
+    profiles: ["services"]
+    environment:
+      <<: *spring-env
+      SPRING_DATA_MONGODB_URI: mongodb://mongo:27017/talent_db
+    ports: ["8087:8087"]
+    depends_on:
+      mongo: { condition: service_started }
+      config-server: { condition: service_started }
+
+networks:
+  challengehub:
 
 volumes:
   keycloak-db-data:
+  postgres-data:
+  mongo-data:
+  mysql-data:
