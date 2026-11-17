@@ -1,0 +1,73 @@
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: optional:configserver:http://localhost:8888
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/utilisateurs/**,/api/entreprises/**
+        - id: hackathon-service
+          uri: lb://hackathon-service
+          predicates:
+            - Path=/api/hackathons/**,/api/equipes/**,/api/inscriptions/**
+        - id: probleme-service
+          uri: lb://probleme-service
+          predicates:
+            - Path=/api/problemes/**
+        - id: soumission-service
+          uri: lb://soumission-service
+          predicates:
+            - Path=/api/soumissions/**
+        - id: execution-service
+          uri: lb://execution-service
+          predicates:
+            - Path=/api/executions/**
+        - id: classement-service
+          uri: lb://classement-service
+          predicates:
+            - Path=/api/classements/**
+        - id: talent-service
+          uri: lb://talent-service
+          predicates:
+            - Path=/api/portfolios/**,/api/recrutements/**
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - http://localhost:4200
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/challengehub
+
+server:
+  port: 8080
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
