@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.carthys.challengehub</groupId>
+    <groupId>tn.esprit.challengehub</groupId>
     <artifactId>config-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>config-server</name>
