@@ -101,20 +101,6 @@ MS5 et MS6 n'utilisent pas Spring Cloud ; chacun a son équivalent.
 | Observabilité | Actuator ou `/health` sur chaque service |
 | Documentation | Swagger / OpenAPI par service |
 | Autonomie | Projet, base et configuration propres ; lancement indépendant |
-
-## Répartition et risques
-
-| Tâche commune | Responsable |
-| :--- | :--- |
-| MS1 Utilisateurs | Toute l'équipe |
-| Eureka, Config Server, API Gateway | À définir |
-| Keycloak (rôles, clients) | À définir |
-| Frontend Angular | Chacun fait les écrans de son service |
-| README et lancement du système | À définir |
-
-| Risque | Solution prévue |
-| :--- | :--- |
-| Exécution du code complexe (MS5) | Prototype testé ; plan B : Judge0 piloté par FastAPI |
 | Code malveillant | Environnement isolé, sans réseau, avec limites |
 | Attente longue de l'exécution | Réponse immédiate 202, interrogation régulière, limite de temps par test |
 | Service indisponible | Timeouts, circuit breaker, reprise planifiée |
