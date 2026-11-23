@@ -1,0 +1,25 @@
+import enum
+
+
+class StatutExecution(str, enum.Enum):
+    EN_ATTENTE = "EN_ATTENTE"
+    EN_COURS = "EN_COURS"
+    TERMINEE = "TERMINEE"
+    ERREUR = "ERREUR"
+
+
+class Verdict(str, enum.Enum):
+    ACCEPTED = "ACCEPTED"
+    WRONG_ANSWER = "WRONG_ANSWER"
+    TIMEOUT = "TIMEOUT"
+    RUNTIME_ERROR = "RUNTIME_ERROR"
+    COMPILATION_ERROR = "COMPILATION_ERROR"
+
+
+class StatutTest(str, enum.Enum):
+    PASSED = "PASSED"
+    WRONG_ANSWER = "WRONG_ANSWER"
+    TIMEOUT = "TIMEOUT"
+    RUNTIME_ERROR = "RUNTIME_ERROR"
+    MEMORY_LIMIT = "MEMORY_LIMIT"
+    COMPILATION_ERROR = "COMPILATION_ERROR"
